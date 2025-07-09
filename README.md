@@ -1,7 +1,8 @@
 ## Zaya Chatbot Backend
 This is the backend API for Zaya, an embedded website chatbot for Leyline that:
 
-- Identifies the user's intent (🎬 Creator, 👩‍💻 Developer, 🐛 Bug Reporter)
+- Identifies the user's intent (Creator or Developer)
+- Provides a button with the link to submit a bug report form
 - Responds with relevant guidance using OpenAI's GPT models
 - Logs all user interactions (intent, messages, timestamp, page URL, and full conversation) into a Feishu (Lark) multi-dimensional table for internal analysis
 
