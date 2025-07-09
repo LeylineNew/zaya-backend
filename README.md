@@ -7,7 +7,7 @@ This is the backend API for Zaya, an embedded website chatbot for Leyline that:
 - Logs all user interactions (intent, messages, timestamp, page URL, and full conversation) into a Feishu (Lark) multi-dimensional table for internal analysis
 
 ### 🔧 Tech Stack
--Python + FastAPI for backend API
+- Python + FastAPI for backend API
 - OpenAI GPT-3.5 Turbo for response generation and summarization
 - Feishu Developer API for data logging into Bitable
 - Pydantic for request validation
