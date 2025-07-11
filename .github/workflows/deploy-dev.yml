@@ -44,5 +44,4 @@ jobs:
                 image: ${{ env.IMAGE }}
                 region: ${{ env.REGION }}
                 project_id: ${{ env.PROJECT_ID }}
-                source: .
                 flags: '--allow-unauthenticated'
