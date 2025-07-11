@@ -1,0 +1,48 @@
+name: Deploy to Dev
+
+on:
+    push:
+        branches:
+        - dev
+    workflow_dispatch:
+
+env:
+    PROJECT_ID: leyline-449216
+    REGION: us-central1
+    SERVICE_NAME: leyline-service-zaya-dev
+    REPO_NAME: dev-repo
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+
+        permissions:
+            contents: read
+            id-token: write
+
+        steps:
+        -   name: Checkout source
+            uses: actions/checkout@v3
+
+        -   name: Generate timestamp
+            id: time
+            run: echo "timestamp=$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_OUTPUT
+
+        -   name: Set IMAGE env
+            run: echo "IMAGE=us-central1-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.SERVICE_NAME }}:${{ steps.time.outputs.timestamp }}" >> $GITHUB_ENV
+
+        -   name: Authenticate to Google Cloud
+            uses: google-github-actions/auth@v1
+            with:
+                workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
+                service_account: ${{ secrets.SERVICE_ACCOUNT_EMAIL }}
+
+        -   name: Deploy to Cloud Run
+            uses: google-github-actions/deploy-cloudrun@v1
+            with:
+                service: ${{ env.SERVICE_NAME }}
+                image: ${{ env.IMAGE }}
+                region: ${{ env.REGION }}
+                project_id: ${{ env.PROJECT_ID }}
+                source: .
+                flags: '--allow-unauthenticated'
