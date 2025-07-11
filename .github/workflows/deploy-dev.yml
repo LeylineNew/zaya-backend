@@ -37,6 +37,15 @@ jobs:
                 workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
                 service_account: ${{ secrets.SERVICE_ACCOUNT_EMAIL }}
 
+        -   name: Configure Docker for Artifact Registry
+            run: |
+                gcloud auth configure-docker us-central1-docker.pkg.dev
+
+        -   name: Build and Push Docker image
+            run: |
+                docker build -t $IMAGE .
+                docker push $IMAGE
+
         -   name: Deploy to Cloud Run
             uses: google-github-actions/deploy-cloudrun@v1
             with:
