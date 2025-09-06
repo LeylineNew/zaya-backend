@@ -85,6 +85,20 @@ async def log_zaya_data(data: ZayaLog):
 
 def generate_ai_response(intent, message, user_id):
     user_conversations.setdefault(user_id, [])
+    
+    # Check if the message is related to our platform
+    platform_keywords = [
+        "leyline", "thunderr squad", "ai film agent", "stormeye", "creator", "developer",
+        "tiktok", "instagram", "youtube", "reels", "shorts", "content", "video", "ai",
+        "growth", "platform", "tool", "feature", "help", "support", "how to", "what is"
+    ]
+    
+    message_lower = message.lower()
+    is_platform_related = any(keyword in message_lower for keyword in platform_keywords)
+    
+    if not is_platform_related:
+        return "I'm only authorized to answer questions on Leyline platform, Thunderr Squad, AI Film Agent, and related creator/developer tools. How can I help you with our platform?"
+    
     messages = [{
         "role": "system",
         "content": f"""You are Zaya, a helpful assistant for creators and developers using Leyline.
@@ -92,7 +106,7 @@ def generate_ai_response(intent, message, user_id):
     Use the following knowledge base to answer any platform-related questions:
     {FAQ_CONTEXT}
 
-    Keep answers concise and friendly. If the user asks something unrelated, just try your best."""
+    Keep answers concise and friendly. Only answer questions related to our platform, tools, and services."""
     }]
 
     # Add prior user messages
