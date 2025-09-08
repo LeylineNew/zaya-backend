@@ -7,6 +7,7 @@ from openai import OpenAI
 from feishu_logger import upsert_log_to_bitable
 import json
 from pathlib import Path
+
 FAQ_CONTEXT = Path("faqs.txt").read_text()
 
 load_dotenv()
@@ -15,15 +16,20 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000",
-                  "https://www.leylinepro.ai",
-                  "https://www.leylinepro.ai/mktp"],
+    allow_origins=[
+        "http://localhost:3000",
+        "https://staging.leylinepro.ai"
+        "https://staging.leylinepro.ai/mktp/"
+        "https://www.leylinepro.ai",
+        "https://www.leylinepro.ai/mktp"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
 
 class ZayaLog(BaseModel):
     userId: str
@@ -33,8 +39,10 @@ class ZayaLog(BaseModel):
     pageUrl: str
     fullConversation: str  # JSON string
 
+
 # Temporary memory to track full message history for better AI replies
 user_conversations = {}
+
 
 @app.post("/api/zaya-log")
 async def log_zaya_data(data: ZayaLog):
@@ -48,13 +56,12 @@ async def log_zaya_data(data: ZayaLog):
         for m in user_conversations[data.userId]
     )
 
-
     # Summarize plain-text version of full convo
     summary_prompt = f"Summarize this user's conversation briefly:\n{plain_text_convo}"
     try:
         summary_response = client.chat.completions.create(
             model="gpt-3.5-turbo",
-            messages=[{ "role": "user", "content": summary_prompt }],
+            messages=[{"role": "user", "content": summary_prompt}],
             temperature=0.5,
             max_tokens=60
         )
@@ -82,6 +89,7 @@ async def log_zaya_data(data: ZayaLog):
         "feishu_response": result,
         "ai_response": ai_reply
     }
+
 
 def generate_ai_response(intent, message, user_id):
     user_conversations.setdefault(user_id, [])
