@@ -9,8 +9,8 @@ on:
 env:
     PROJECT_ID: leyline-449216
     REGION: us-central1
-    SERVICE_NAME: leyline-service-zaya-dev
     REPO_NAME: dev-repo
+    SERVICE_NAME: leyline-service-zaya-dev
 
 jobs:
     deploy:
