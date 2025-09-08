@@ -1,61 +1,60 @@
 name: Deploy to Staging
-
 on:
-  push:
-    branches:
-      - staging
-  workflow_dispatch:
+    push:
+        branches:
+        - staging
+    workflow_dispatch:
 
 env:
-  PROJECT_ID: leyline-449216
-  REGION: us-central1
-  SERVICE_NAME: leyline-service-zaya-staging
-  REPO_NAME: staging-repo
-  DEPLOYER_SERVICE_ACCOUNT: github-deployer@leyline-449216.iam.gserviceaccount.com
+    PROJECT_ID: leyline-449216
+    REGION: us-central1
+    REPO_NAME: staging-repo
+    SERVICE_NAME: leyline-service-zaya-staging
 
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
+    deploy:
+        runs-on: ubuntu-latest
 
-    permissions:
-      contents: read
-      id-token: write
+        permissions:
+            contents: read
+            id-token: write
 
-    steps:
-    - name: Checkout source
-      uses: actions/checkout@v3
+        steps:
+        -   name: Checkout source
+            uses: actions/checkout@v3
 
-    - name: Generate timestamp
-      id: time
-      run: echo "timestamp=$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_OUTPUT
+        -   name: Generate timestamp
+            id: time
+            run: echo "timestamp=$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_OUTPUT
 
-    - name: Set IMAGE env
-      run: echo "IMAGE=us-central1-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.SERVICE_NAME }}:${{ steps.time.outputs.timestamp }}" >> $GITHUB_ENV
+        -   name: Set IMAGE env
+            run: echo "IMAGE=us-central1-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.SERVICE_NAME }}:${{ steps.time.outputs.timestamp }}" >> $GITHUB_ENV
 
-    - name: Authenticate to Google Cloud
-      uses: google-github-actions/auth@v1
-      with:
-        workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
-        service_account: ${{ secrets.SERVICE_ACCOUNT_EMAIL }}
+        -   name: Authenticate to Google Cloud
+            uses: google-github-actions/auth@v1
+            with:
+                workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
+                service_account: ${{ secrets.SERVICE_ACCOUNT_EMAIL }}
 
-    - name: Set up gcloud CLI
-      uses: google-github-actions/setup-gcloud@v1
-      with:
-        project_id: ${{ env.PROJECT_ID }}
+        -   name: Set up gcloud CLI
+            uses: google-github-actions/setup-gcloud@v1
+            with:
+                project_id: ${{ env.PROJECT_ID }}
 
-    - name: Configure Docker for Artifact Registry
-      run: gcloud auth configure-docker us-central1-docker.pkg.dev
+        -   name: Configure Docker for Artifact Registry
+            run: |
+                gcloud auth configure-docker us-central1-docker.pkg.dev
 
-    - name: Build and Push Docker image
-      run: |
-        docker build -t $IMAGE .
-        docker push $IMAGE
+        -   name: Build and Push Docker image
+            run: |
+                docker build -t $IMAGE .
+                docker push $IMAGE
 
-    - name: Deploy to Cloud Run
-      uses: google-github-actions/deploy-cloudrun@v1
-      with:
-        service: ${{ env.SERVICE_NAME }}
-        image: ${{ env.IMAGE }}
-        region: ${{ env.REGION }}
-        project_id: ${{ env.PROJECT_ID }}
-        flags: '--allow-unauthenticated'
+        -   name: Deploy to Cloud Run
+            uses: google-github-actions/deploy-cloudrun@v1
+            with:
+                service: ${{ env.SERVICE_NAME }}
+                image: ${{ env.IMAGE }}
+                region: ${{ env.REGION }}
+                project_id: ${{ env.PROJECT_ID }}
+                flags: '--allow-unauthenticated'
