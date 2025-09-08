@@ -18,8 +18,8 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:3000",
-        "https://staging.leylinepro.ai"
-        "https://staging.leylinepro.ai/mktp/"
+        "https://staging.leylinepro.ai",
+        "https://staging.leylinepro.ai/mktp/",
         "https://www.leylinepro.ai",
         "https://www.leylinepro.ai/mktp"
     ],
